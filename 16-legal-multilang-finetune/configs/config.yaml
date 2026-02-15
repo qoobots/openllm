@@ -1,0 +1,26 @@
+model:
+  name: "legal-multilang-llm"
+  path: "Qwen/Qwen-7B-Chat"
+  use_lora: true
+  lora_r: 16
+  lora_alpha: 32
+
+training:
+  batch_size: 8
+  gradient_accumulation_steps: 4
+  num_epochs: 3
+  learning_rate: 1.5e-4
+
+data:
+  train_path: "data/train_multilang_contracts.jsonl"
+  val_path: "data/val_multilang_contracts.jsonl"
+
+federated_learning:
+  enabled: true
+  server_address: "127.0.0.1:8080"
+
+evaluation:
+  targets:
+    multilang_accuracy: 0.95
+    term_translation_accuracy: 0.99
+    risk_prediction_accuracy: 0.98

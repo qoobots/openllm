@@ -1,0 +1,28 @@
+model:
+  name: "llama2-70b-qlora"
+  path: "meta-llama/Llama-2-70b-hf"
+  use_lora: true
+  lora_r: 16
+  lora_alpha: 32
+
+training:
+  batch_size: 4
+  gradient_accumulation_steps: 8
+  num_epochs: 3
+  learning_rate: 2.0e-4
+  weight_decay: 0.01
+  warmup_steps: 100
+  use_fp16: true
+
+data:
+  train_path: "data/train_defects.jsonl"
+  val_path: "data/val_defects.jsonl"
+
+federated_learning:
+  enabled: true
+  server_address: "127.0.0.1:8080"
+
+evaluation:
+  targets:
+    quality_accuracy: 0.995
+    cross_factory_generalization: 0.30

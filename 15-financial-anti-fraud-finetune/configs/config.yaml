@@ -1,0 +1,22 @@
+model:
+  name: "financial-anti-fraud-llm"
+  path: "PaddlePaddle/ernie-3.0-base-zh"
+  use_lora: true
+  lora_r: 16
+  lora_alpha: 32
+
+training:
+  batch_size: 8
+  gradient_accumulation_steps: 4
+  num_epochs: 3
+  learning_rate: 2.0e-4
+
+data:
+  train_path: "data/train_fraud_cases.jsonl"
+  val_path: "data/val_fraud_cases.jsonl"
+
+evaluation:
+  targets:
+    fraud_detection_rate: 0.99
+    false_positive_rate: 0.001
+    watermark_detection_rate: 0.98

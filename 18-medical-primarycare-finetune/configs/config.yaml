@@ -1,0 +1,26 @@
+model:
+  name: "medical-primarycare-llm"
+  path: "Qwen/Qwen-14B-Chat"
+  use_lora: true
+  lora_r: 16
+  lora_alpha: 32
+
+training:
+  batch_size: 8
+  gradient_accumulation_steps: 4
+  num_epochs: 3
+  learning_rate: 1.5e-4
+
+data:
+  train_path: "data/train_primarycare_data.jsonl"
+  val_path: "data/val_primarycare_data.jsonl"
+
+federated_learning:
+  enabled: true
+  server_address: "127.0.0.1:8080"
+
+evaluation:
+  targets:
+    primarycare_diagnosis_accuracy: 0.92
+    heterogeneity_adaptation_rate: 0.95
+    misdiagnosis_rate: 0.002

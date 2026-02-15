@@ -1,0 +1,26 @@
+model:
+  name: "manufacturing-prediction-llm"
+  path: "meta-llama/Llama-2-70b-hf"
+  use_lora: true
+  lora_r: 16
+  lora_alpha: 32
+
+training:
+  batch_size: 4
+  gradient_accumulation_steps: 8
+  num_epochs: 3
+  learning_rate: 2.0e-4
+
+data:
+  train_path: "data/train_sensor_data.jsonl"
+  val_path: "data/val_sensor_data.jsonl"
+
+federated_learning:
+  enabled: true
+  server_address: "127.0.0.1:8080"
+
+evaluation:
+  targets:
+    failure_prediction_accuracy: 0.96
+    prediction_lead_time_days: 15
+    downtime_reduction_rate: 0.40

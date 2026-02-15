@@ -1,0 +1,45 @@
+model:
+  name: "ernie-bot-finance"
+  path: "PaddlePaddle/ernie-3.0-base-zh"  # 或金融专用模型路径
+  use_lora: true
+  lora_r: 16
+  lora_alpha: 32
+
+training:
+  batch_size: 8
+  gradient_accumulation_steps: 4
+  num_epochs: 3
+  learning_rate: 2.0e-4
+  weight_decay: 0.01
+  warmup_steps: 100
+  use_fp16: true
+  logging_steps: 10
+  eval_steps: 500
+  save_steps: 1000
+
+data:
+  train_path: "data/train_contracts.jsonl"
+  val_path: "data/val_contracts.jsonl"
+  max_length: 1024
+  dapt_data_path: "data/domain_texts.jsonl"
+  dpo_data_path: "data/preference_pairs.jsonl"
+
+output:
+  output_dir: "models/financial_compliance_model"
+  checkpoint_dir: "models/checkpoints"
+
+paths:
+  dapt_model: "models/dapt_checkpoint"
+  sft_model: "models/sft_checkpoint"
+  dpo_model: "models/dpo_checkpoint"
+
+evaluation:
+  metrics:
+    - "clause_recall"
+    - "false_positive_rate"
+    - "compliance_accuracy"
+
+targets:
+  clause_recall: 0.98
+  false_positive_rate: 0.005
+  compliance_accuracy: 0.995

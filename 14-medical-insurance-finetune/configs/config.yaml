@@ -1,0 +1,21 @@
+model:
+  name: "medical-insurance-llm"
+  path: "Qwen/Qwen-14B-Chat"
+  use_lora: true
+  lora_r: 16
+  lora_alpha: 32
+
+training:
+  batch_size: 8
+  gradient_accumulation_steps: 4
+  num_epochs: 3
+  learning_rate: 1.5e-4
+
+data:
+  train_path: "data/train_violations.jsonl"
+  val_path: "data/val_violations.jsonl"
+
+evaluation:
+  targets:
+    violation_detection_rate: 0.98
+    response_time_ms: 500

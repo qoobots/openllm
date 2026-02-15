@@ -1,0 +1,56 @@
+model:
+  name: "qwen3-vl-8b-thinking"
+  path: "Qwen/Qwen-VL"  # 多模态模型路径
+  use_lora: true
+  lora_r: 16
+  lora_alpha: 32
+
+training:
+  batch_size: 4  # 视觉模型batch size较小
+  gradient_accumulation_steps: 8
+  num_epochs: 5
+  learning_rate: 1.0e-4
+  weight_decay: 0.01
+  warmup_steps: 200
+  use_fp16: true
+  logging_steps: 10
+  eval_steps: 500
+  save_steps: 1000
+
+data:
+  train_path: "data/train_medical_images.jsonl"
+  val_path: "data/val_medical_images.jsonl"
+  max_length: 512
+  image_size: 224
+  heterogeneity_data_path: "data/device_heterogeneity.jsonl"
+  misdiagnosis_cases_path: "data/misdiagnosis_cases.jsonl"
+
+federated_learning:
+  enabled: true
+  server_address: "127.0.0.1:8080"
+  num_clients: 10
+  num_rounds: 10
+  local_epochs: 3
+  min_fit_clients: 8
+  min_available_clients: 8
+
+output:
+  output_dir: "models/medical_diagnosis_model"
+  checkpoint_dir: "models/checkpoints"
+
+paths:
+  rag_model: "models/rag_checkpoint"
+  sft_model: "models/sft_checkpoint"
+
+evaluation:
+  metrics:
+    - "misdiagnosis_rate_primary"  # 基层医院误诊率
+    - "misdiagnosis_rate_tertiary"  # 三甲医院误诊率
+    - "interpretability_score"     # 可解释性评分
+    - "heterogeneity_adaptation"   # 异构适应性
+
+targets:
+  misdiagnosis_rate_primary: 0.04  # 基层医院目标误诊率
+  misdiagnosis_rate_tertiary: 0.0648  # 三甲医院误诊率降低19%
+  interpretability_score: 0.92
+  heterogeneity_adaptation: 0.95
