@@ -4,7 +4,7 @@ from torch.utils.data import Dataset
 
 
 class FinancialFairnessDataset(Dataset):
-    """金融公平性数据集"""
+    """FinancialFairness数据集"""
     
     def __init__(self, data_path, tokenizer, max_length=512):
         self.data = []
@@ -21,17 +21,11 @@ class FinancialFairnessDataset(Dataset):
     def __getitem__(self, idx):
         item = self.data[idx]
         
-        prompt = f"""公平性评估任务：
-申请类型：{item.get('application_type', '贷款申请')}
-申请人信息：{item.get('applicant_info', '')}
-敏感属性：{item.get('sensitive_attributes', '')}
-
-请评估决策的公平性：
-
-公平性评估："""
+        # 构建输入
+        prompt = self._format_prompt(item)
+        response = item.get('response', '')
         
-        response = item.get('fairness_analysis', '')
-        
+        # Tokenize
         inputs = self.tokenizer(
             prompt + response,
             truncation=True,
@@ -40,6 +34,7 @@ class FinancialFairnessDataset(Dataset):
             return_tensors="pt"
         )
         
+        # 创建labels
         labels = inputs['input_ids'].clone()
         prompt_length = len(self.tokenizer(prompt)['input_ids'])
         labels[0, :prompt_length] = -100
@@ -49,3 +44,7 @@ class FinancialFairnessDataset(Dataset):
             'attention_mask': inputs['attention_mask'].squeeze(),
             'labels': labels.squeeze()
         }
+    
+    def _format_prompt(self, item):
+        """格式化提示词"""
+        return f"Task: {item.get('input', 'Unknown')}\nOutput: "

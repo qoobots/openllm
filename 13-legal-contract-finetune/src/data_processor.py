@@ -4,9 +4,9 @@ from torch.utils.data import Dataset
 
 
 class LegalContractDataset(Dataset):
-    """法律合同数据集"""
+    """LegalContract数据集"""
     
-    def __init__(self, data_path, tokenizer, max_length=1024):
+    def __init__(self, data_path, tokenizer, max_length=512):
         self.data = []
         with open(data_path, 'r', encoding='utf-8') as f:
             for line in f:
@@ -21,20 +21,11 @@ class LegalContractDataset(Dataset):
     def __getitem__(self, idx):
         item = self.data[idx]
         
-        prompt = f"""合同审查任务：
-合同类型：{item.get('contract_type', '')}
-合同方：{item.get('parties', '')}
-法律体系：{item.get('jurisdiction', '')}
-
-合同内容：
-{item.get('contract_content', '')}
-
-请审查合规性并识别风险：
-
-合规审查："""
+        # 构建输入
+        prompt = self._format_prompt(item)
+        response = item.get('response', '')
         
-        response = item.get('compliance_analysis', '')
-        
+        # Tokenize
         inputs = self.tokenizer(
             prompt + response,
             truncation=True,
@@ -43,6 +34,7 @@ class LegalContractDataset(Dataset):
             return_tensors="pt"
         )
         
+        # 创建labels
         labels = inputs['input_ids'].clone()
         prompt_length = len(self.tokenizer(prompt)['input_ids'])
         labels[0, :prompt_length] = -100
@@ -52,3 +44,7 @@ class LegalContractDataset(Dataset):
             'attention_mask': inputs['attention_mask'].squeeze(),
             'labels': labels.squeeze()
         }
+    
+    def _format_prompt(self, item):
+        """格式化提示词"""
+        return f"Task: {item.get('input', 'Unknown')}\nOutput: "
