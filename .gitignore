@@ -205,3 +205,11 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+/20-annual-report-finetune/scripts/data/
+/20-annual-report-finetune/data/
+# 大型数据文件
+*.pdf
+*.json
+*.jsonl
+*.parquet
+*.csv

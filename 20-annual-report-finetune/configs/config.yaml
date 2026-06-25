@@ -1,0 +1,107 @@
+# 年报分析微调系统配置文件
+
+model:
+  # 基座模型配置
+  name: "Qwen/Qwen2.5-7B-Instruct"  # 或其他金融领域模型
+  path: "Qwen/Qwen2.5-7B-Instruct"
+
+  # PEFT配置
+  use_lora: true
+  lora_r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+
+  # 量化配置（节省显存）
+  load_in_8bit: false
+  load_in_4bit: true
+
+  # LoRA目标模块
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+
+training:
+  # 通用训练参数
+  batch_size: 4
+  gradient_accumulation_steps: 4
+  num_epochs: 3
+  learning_rate: 2.0e-4
+  weight_decay: 0.01
+  warmup_steps: 100
+  max_grad_norm: 1.0
+
+  # 精度配置
+  use_fp16: true
+  use_bf16: false
+
+  # 日志和保存
+  logging_steps: 10
+  eval_steps: 500
+  save_steps: 1000
+  save_total_limit: 3
+
+data:
+  # 数据路径
+  train_path: "data/processed/sft_train.jsonl"
+  val_path: "data/processed/sft_val.jsonl"
+  dapt_data_path: "data/processed/dapt_train.txt"
+  dpo_data_path: "data/processed/dpo_train.jsonl"
+
+  # 数据处理参数
+  max_length: 2048
+  train_val_split: 0.9
+
+output:
+  output_dir: "models/annual_report_model"
+  checkpoint_dir: "models/checkpoints"
+
+# 不同阶段的模型路径
+paths:
+  dapt_model: "models/dapt_model"
+  sft_model: "models/sft_model"
+  dpo_model: "models/dpo_model"
+  final_model: "models/annual_report_model"
+
+# 评估配置
+evaluation:
+  metrics:
+    - "financial_indicator_accuracy"
+    - "risk_detection_accuracy"
+    - "qa_accuracy"
+    - "generation_quality"
+
+  targets:
+    financial_indicator_accuracy: 0.95
+    risk_detection_accuracy: 0.90
+    qa_accuracy: 0.93
+    generation_quality: 0.85
+
+# 数据增强配置
+data_augmentation:
+  enabled: true
+  methods:
+    - "self_instruct"
+    - "back_translation"
+    - "paraphrase"
+
+  self_instruct:
+    num_samples: 5000
+    templates_path: "configs/self_instruct_templates.txt"
+
+# 推理配置
+inference:
+  temperature: 0.7
+  top_p: 0.9
+  top_k: 50
+  max_new_tokens: 1024
+  do_sample: true
+
+# 日志配置
+logging:
+  level: "INFO"
+  log_dir: "logs"
